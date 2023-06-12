@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - apirest
+
+  mariadb:
+    image: "mariadb"
+    container_name: mariadb
+    volumes: 
+        - ./.docker/mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    env_file:
+      - ./env/mariadb.env
+    restart: always
+    networks:
+      - apirest
+
+  backend:
+    image: saipers/apirestcursojs
+    #build: ./backend
+    container_name: backend
+    ports:
+      - 3001:3001
+    volumes:
+      - ./backend:/app
+    networks:
+      - apirest
+
+  frontend:
+    image: saipers/reactfrontcursojs
+    #build: ./frontend
+    container_name: frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/app/src
+      #- ./frontend:/app
+    stdin_open: true
+    tty: true
+    networks:
+      - apirest
+       
+volumes:
+  dbdata:
+  logs:
+
+networks:
+  apirest:
+    driver: bridge
